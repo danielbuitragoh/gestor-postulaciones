@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSesion } from '../estado/sesion';
-import { usarPostulaciones } from '../estado/usarPostulaciones';
+  import { usePostulaciones } from '../estado/usePostulaciones';
 import { Tablero } from '../componentes/Tablero';
 import { Dialogo } from '../componentes/Dialogo';
 import { Formulario } from '../componentes/Formulario';
@@ -13,7 +13,7 @@ type Vista = 'tablero' | 'metricas';
 
 export function Panel() {
   const { api, usuario, salir } = useSesion();
-  const datos = usarPostulaciones(api);
+  const datos = usePostulaciones(api);
 
   const [vista, setVista] = useState<Vista>('tablero');
   const [nueva, setNueva] = useState(false);
