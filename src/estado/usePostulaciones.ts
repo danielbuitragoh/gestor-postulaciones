@@ -21,7 +21,7 @@ interface Estado0 {
   error: Error | null;
 }
 
-export function usarPostulaciones(api: Api) {
+export function usePostulaciones(api: Api) {
   const [s, setS] = useState<Estado0>({ postulaciones: [], cargando: true, error: null });
   const [aviso, setAviso] = useState<string | null>(null);
   const montado = useRef(true);
