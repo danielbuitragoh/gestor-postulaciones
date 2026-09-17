@@ -1,0 +1,317 @@
+/* ===================================================================
+   Gestor de candidaturas · sistema visual
+
+   Misma familia que el resto del portafolio: cromo monocromo, y el
+   color reservado para lo que significa algo. Aquí lo que significa
+   algo son las columnas del tablero, y ni siquiera ellas llevan color
+   de relleno — solo una línea superior. Cinco columnas de colores
+   distintos convierten el tablero en un semáforo y el ojo deja de
+   leer los títulos.
+   =================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --plano:            #f9f9f7;
+  --superficie:       #fcfcfb;
+  --superficie-alta:  #f2f2ef;
+  --tinta:            #0b0b0b;
+  --tinta-2:          #52514e;
+  --tinta-3:          #898781;
+  --borde:            rgba(11, 11, 11, .10);
+  --eje:              #c3c2b7;
+
+  --col-1: #2a78d6;
+  --col-2: #1baf7a;
+  --col-3: #eda100;
+  --col-4: #0ca30c;
+  --col-5: #898781;
+
+  --bien:    #0ca30c;
+  --critico: #d03b3b;
+
+  --fuente: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --mono:   "JetBrains Mono", ui-monospace, monospace;
+  --curva:  cubic-bezier(.22, 1, .36, 1);
+  --radio:  12px;
+}
+
+/* El modo oscuro se elige valor a valor, no se invierte: bajar el
+   brillo de los colores claros produce tonos sucios. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    color-scheme: dark;
+    --plano:           #0d0d0d;
+    --superficie:      #1a1a19;
+    --superficie-alta: #232321;
+    --tinta:           #ffffff;
+    --tinta-2:         #c3c2b7;
+    --tinta-3:         #898781;
+    --borde:           rgba(255, 255, 255, .10);
+    --eje:             #383835;
+    --col-1: #3987e5;
+    --col-2: #199e70;
+    --col-3: #c98500;
+    --col-4: #34b134;
+    --col-5: #6f6e69;
+    --critico: #e06565;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--plano);
+  color: var(--tinta);
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid var(--tinta); outline-offset: 3px; border-radius: 4px; }
+
+.solo-lectores {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---------- estructura ---------- */
+.marco { max-width: 1320px; margin: 0 auto; padding: clamp(18px, 3.5vw, 36px); }
+
+.barra {
+  display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap;
+  padding-bottom: 18px; border-bottom: 1px solid var(--borde); margin-bottom: 22px;
+}
+.barra h1 { font-size: clamp(1.3rem, 2.6vw, 1.7rem); font-weight: 600; letter-spacing: -.02em; }
+.barra .sub { color: var(--tinta-3); font-size: 13px; }
+.barra .derecha { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+
+/* En pantallas estrechas la cabecera se apila en vez de comprimirse. Con
+   `margin-left: auto` y poco ancho, la fila se sale del viewport por la
+   derecha y el botón de salir queda cortado: no se ve, y no se puede pulsar. */
+@media (max-width: 620px) {
+  .barra { flex-direction: column; align-items: stretch; gap: 12px; }
+  .barra .derecha { margin-left: 0; justify-content: space-between; }
+  .grupo { align-self: flex-start; }
+}
+
+.grupo { display: flex; gap: 4px; background: var(--superficie-alta); padding: 3px; border-radius: 999px; }
+.grupo button {
+  font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--tinta-2);
+  padding: 6px 15px; border-radius: 999px; cursor: pointer;
+  transition: background .2s var(--curva), color .2s var(--curva);
+}
+.grupo button:hover { color: var(--tinta); }
+.grupo button[aria-pressed="true"] { background: var(--superficie); color: var(--tinta); font-weight: 500; }
+
+/* ---------- botones ---------- */
+.boton {
+  font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--tinta); background: transparent; color: var(--tinta);
+  padding: 8px 17px; border-radius: 999px;
+  transition: background .2s var(--curva), color .2s var(--curva), opacity .2s;
+}
+.boton:hover { background: var(--tinta); color: var(--superficie); }
+.boton.principal { background: var(--tinta); color: var(--plano); }
+.boton.principal:hover { opacity: .86; }
+.boton:disabled { opacity: .5; cursor: progress; }
+.boton.ancho { width: 100%; justify-content: center; }
+
+.enlace {
+  font: inherit; font-size: 13.5px; background: none; border: 0; cursor: pointer;
+  color: var(--tinta-2); text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: var(--eje); padding: 0;
+}
+.enlace:hover { color: var(--tinta); text-decoration-color: currentColor; }
+.enlace.borrar { color: var(--critico); text-decoration-color: currentColor; }
+
+/* ---------- tablero ---------- */
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(216px, 1fr));
+  gap: 14px;
+  /* En pantallas estrechas el tablero se desplaza en horizontal con
+     ajuste por columna, en vez de apilarse: apiladas, cinco columnas
+     son una lista de 40 tarjetas y se pierde la idea de embudo. */
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 8px;
+}
+.columna {
+  scroll-snap-align: start;
+  background: var(--superficie-alta);
+  border-radius: var(--radio);
+  padding: 14px 12px;
+  min-height: 260px;
+  transition: background .18s var(--curva), box-shadow .18s var(--curva);
+}
+/* Al arrastrar encima, la columna se marca con un anillo además del
+   cambio de fondo: un cambio de tono muy sutil se pierde a la luz del
+   sol o con poca vista. */
+.columna.encima { background: var(--superficie); box-shadow: inset 0 0 0 2px var(--tinta-3); }
+.columna > header { margin-bottom: 12px; padding: 0 4px; }
+.columna h2 {
+  font-size: 13px; font-weight: 600; letter-spacing: .01em;
+  display: flex; align-items: center; gap: 8px;
+}
+.columna header p { font-size: 11.5px; color: var(--tinta-3); margin-top: 1px; }
+.columna .cuenta {
+  font-family: var(--mono); font-size: 11px; color: var(--tinta-3);
+  background: var(--superficie); border-radius: 999px; padding: 1px 7px;
+}
+.columna:nth-child(1) h2 { box-shadow: inset 0 2px 0 0 transparent; }
+.columna:nth-child(1) { border-top: 2px solid var(--col-1); }
+.columna:nth-child(2) { border-top: 2px solid var(--col-2); }
+.columna:nth-child(3) { border-top: 2px solid var(--col-3); }
+.columna:nth-child(4) { border-top: 2px solid var(--col-4); }
+.columna:nth-child(5) { border-top: 2px solid var(--col-5); }
+
+.pila { display: grid; gap: 9px; }
+.vacia { font-size: 12.5px; color: var(--tinta-3); padding: 10px 4px; }
+
+/* ---------- tarjeta ---------- */
+.tarjeta {
+  background: var(--superficie); border: 1px solid var(--borde);
+  border-radius: 10px; padding: 11px 12px;
+  cursor: grab; touch-action: none;
+}
+.tarjeta:active { cursor: grabbing; }
+.tarjeta.arrastrando {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .18);
+  transform: rotate(1.5deg);
+  cursor: grabbing;
+}
+.tarjeta .abrir {
+  display: block; width: 100%; text-align: left;
+  background: none; border: 0; padding: 0; cursor: pointer; font: inherit;
+}
+.tarjeta .puesto { display: block; font-size: 14px; font-weight: 600; letter-spacing: -.01em; color: var(--tinta); }
+.tarjeta .empresa { display: block; font-size: 13px; color: var(--tinta-2); }
+.tarjeta .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; font-size: 11.5px; color: var(--tinta-3); }
+.tarjeta .etiqueta, .tarjeta .sueldo {
+  background: var(--superficie-alta); border-radius: 5px; padding: 1px 6px;
+  font-family: var(--mono); font-size: 10.5px; text-transform: lowercase;
+}
+.tarjeta .fecha { font-size: 11px; color: var(--tinta-3); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.tarjeta .mover { display: block; margin-top: 9px; }
+.tarjeta .mover select {
+  font: inherit; font-size: 11.5px; width: 100%;
+  color: var(--tinta-2); background: var(--superficie-alta);
+  border: 1px solid var(--borde); border-radius: 7px; padding: 4px 7px; cursor: pointer;
+}
+
+/* ---------- diálogo ---------- */
+.dialogo {
+  border: 1px solid var(--borde); border-radius: 14px; padding: 0;
+  background: var(--superficie); color: var(--tinta);
+  width: min(560px, calc(100vw - 32px)); max-height: 88vh;
+}
+.dialogo::backdrop { background: rgba(0, 0, 0, .42); backdrop-filter: blur(2px); }
+.dialogo > header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px; border-bottom: 1px solid var(--borde);
+  position: sticky; top: 0; background: var(--superficie); border-radius: 14px 14px 0 0;
+}
+.dialogo h2 { font-size: 1rem; font-weight: 600; letter-spacing: -.01em; }
+.dialogo .cerrar {
+  margin-left: auto; font: inherit; font-size: 20px; line-height: 1;
+  background: none; border: 0; color: var(--tinta-3); cursor: pointer; padding: 2px 6px;
+}
+.dialogo .cerrar:hover { color: var(--tinta); }
+.dialogo .cuerpo { padding: 18px; overflow-y: auto; max-height: calc(88vh - 60px); }
+
+/* ---------- formularios ---------- */
+.formulario { display: grid; gap: 13px; }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+@media (max-width: 480px) { .dos { grid-template-columns: 1fr; } }
+
+.campo { display: grid; gap: 5px; }
+.campo > span { font-size: 12.5px; color: var(--tinta-2); font-weight: 500; }
+.campo > span i { color: var(--tinta-3); font-style: normal; }
+.campo input, .campo select, .campo textarea {
+  font: inherit; font-size: 14.5px; color: var(--tinta); width: 100%;
+  background: var(--plano); border: 1px solid var(--borde);
+  border-radius: 9px; padding: 9px 11px;
+}
+.campo textarea { resize: vertical; min-height: 68px; }
+/* El campo con error se marca con borde Y mensaje. Solo el borde rojo
+   deja fuera a quien no distingue ese rojo del borde normal. */
+.campo input[aria-invalid="true"] { border-color: var(--critico); }
+.campo .error { font-style: normal; font-size: 12px; color: var(--critico); }
+.campo .pista, .pista { font-style: normal; font-size: 12px; color: var(--tinta-3); }
+
+.acciones { display: flex; justify-content: flex-end; margin-top: 4px; }
+.peligro {
+  margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--borde);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+
+/* ---------- estados ---------- */
+.aviso-error {
+  background: var(--superficie); border: 1px solid var(--critico); color: var(--tinta);
+  border-radius: 10px; padding: 10px 14px; font-size: 13.5px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.aviso {
+  border: 1px solid var(--borde); border-radius: var(--radio);
+  padding: 30px; text-align: center; background: var(--superficie);
+}
+.aviso h2 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.aviso p { color: var(--tinta-2); font-size: 14px; max-width: 48ch; margin: 0 auto 14px; }
+
+.esqueleto {
+  background: linear-gradient(90deg, var(--superficie-alta) 25%, var(--borde) 37%, var(--superficie-alta) 63%);
+  background-size: 400% 100%; animation: brillo 1.3s ease-in-out infinite; border-radius: var(--radio);
+}
+@keyframes brillo { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+.vacio-grande { text-align: center; padding: 64px 20px; }
+.vacio-grande h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 7px; }
+.vacio-grande p { color: var(--tinta-2); max-width: 46ch; margin: 0 auto 18px; }
+
+.cargando-inicial { min-height: 100vh; }
+
+/* ---------- métricas ---------- */
+.metricas { display: grid; gap: 16px; }
+.panel {
+  background: var(--superficie); border: 1px solid var(--borde);
+  border-radius: var(--radio); padding: 20px;
+}
+.panel h2 { font-size: 1rem; font-weight: 600; letter-spacing: -.01em; }
+.panel .explica { color: var(--tinta-2); font-size: 13.5px; margin-top: 3px; max-width: 70ch; }
+
+.numerones { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-top: 14px; }
+.numeron .cifra { font-size: 2rem; font-weight: 600; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.numeron .cifra small { font-size: .9rem; font-weight: 400; color: var(--tinta-3); letter-spacing: 0; }
+.numeron .texto { font-size: 13px; color: var(--tinta-2); }
+.numeron .nota { font-family: var(--mono); font-size: 11px; color: var(--tinta-3); margin-top: 2px; }
+
+.embudo { list-style: none; display: grid; gap: 13px; margin-top: 16px; }
+.embudo .etiqueta { display: flex; justify-content: space-between; font-size: 13px; color: var(--tinta-2); margin-bottom: 5px; }
+.embudo .etiqueta b { color: var(--tinta); font-variant-numeric: tabular-nums; }
+.embudo .tasa { color: var(--tinta-3); font-weight: 400; }
+.embudo .via { height: 8px; background: var(--superficie-alta); border-radius: 999px; overflow: hidden; }
+.embudo .via span { display: block; height: 100%; background: var(--tinta); border-radius: 999px; }
+
+.meses { list-style: none; display: grid; gap: 7px; margin-top: 14px; }
+.meses li { display: grid; grid-template-columns: 62px 1fr auto; align-items: center; gap: 10px; font-size: 13px; }
+.meses .mes { color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.meses .barra { height: 8px; background: var(--tinta-3); border-radius: 999px; min-width: 3px; }
+.meses .n { font-variant-numeric: tabular-nums; color: var(--tinta-2); }
+
+/* ---------- acceso ---------- */
+.acceso { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.caja { width: min(400px, 100%); }
+.caja h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -.025em; }
+.caja .lema { color: var(--tinta-2); font-size: 14px; margin: 6px 0 24px; }
+.caja form { display: grid; gap: 14px; }
+.caja .cambiar { margin-top: 18px; font-size: 13.5px; color: var(--tinta-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* El aviso de "parada" se marca en tinta normal y no en rojo: es un recordatorio
+   de escribir, no un error, y el rojo está reservado para lo que va mal. */
+.tarjeta .parada { color: var(--tinta-2); font-weight: 500; }

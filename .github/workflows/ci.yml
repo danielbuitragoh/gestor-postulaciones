@@ -1,0 +1,23 @@
+# Comprueba tipos, lint y construcción en cada cambio. Es el mínimo honesto
+# para un front: si el build no pasa, lo que está desplegado no es este código.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # `npm ci` y no `npm install`: instala exactamente lo del lock, así que
+      # CI prueba el mismo árbol de dependencias que se despliega.
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
