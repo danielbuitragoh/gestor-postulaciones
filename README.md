@@ -76,3 +76,14 @@ npm run preview   # sirve lo empaquetado
 ## Licencia
 
 MIT · [Daniel Buitrago](https://github.com/danielbuitragoh)
+
+
+---
+
+## English
+
+A Kanban board for a job search, with accessible drag-and-drop, reversible optimistic updates, and metrics that do not lie when there is no data yet.
+
+Built with React 19 and TypeScript against my own API, with no state library, no chart library and no component template. Drag-and-drop uses dnd-kit instead of native HTML5 drag, specifically because the native version does not work with a keyboard: moving a card is the core action of this screen, so every card also has a plain status selector as a fallback. Moving a card updates the screen first and the server second, and rolls back with an explanation if the server rejects the change. The access token lives only in memory, never in localStorage, and refresh-token races are protected by a single shared promise so that several expired-token requests do not race each other into invalid tokens. With zero applications, the funnel shows an empty state and an instruction instead of a wall of misleading zeros.
+
+Code and comments are in Spanish.
