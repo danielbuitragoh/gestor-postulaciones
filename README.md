@@ -68,15 +68,24 @@ npm run dev
 Los demás comandos:
 
 ```bash
-npm run build     # comprueba tipos y empaqueta
-npm run lint      # oxlint
-npm run preview   # sirve lo empaquetado
+npm run build # comprueba tipos y empaqueta
+npm run lint # oxlint
+npm run preview # sirve lo empaquetado
 ```
+
+## Lo que no está hecho
+
+Prefiero decirlo a que se note.
+
+- **No hay exportación de datos.** El historial de eventos vive en PostgreSQL y se lee desde la pantalla de Métricas, pero no hay manera de sacarlo en CSV o PDF para llevarlo a otro sitio.
+- **Sin notificaciones ni recordatorios.** Si una candidatura lleva semanas sin respuesta, hay que entrar a mirar; no hay aviso por correo ni dentro de la propia app.
+- **Una cuenta, un tablero.** No hay equipos ni tableros compartidos: cada cuenta ve solo sus propias candidaturas, y no existe la opción de invitar a otra persona a colaborar en el mismo proceso de búsqueda.
+- **Sin integración con bolsas de empleo.** Cada candidatura se da de alta a mano; no hay manera de importarla automáticamente al aplicar desde LinkedIn, InfoJobs u otro sitio.
+- **Web responsive, no app ni PWA.** Funciona en el navegador del móvil, pero no es instalable ni funciona sin conexión.
 
 ## Licencia
 
 MIT · [Daniel Buitrago](https://github.com/danielbuitragoh)
-
 
 ---
 
