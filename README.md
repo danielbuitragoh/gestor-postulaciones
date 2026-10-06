@@ -73,6 +73,10 @@ npm run lint # oxlint
 npm run preview # sirve lo empaquetado
 ```
 
+### Exportar
+
+El botón **Exportar CSV** de la barra descarga todas las candidaturas con su estado, fechas, salario, enlace y notas. Usa `;` como separador y BOM UTF-8 para que Excel en español lo abra con doble clic, en columnas y con las tildes bien.
+
 ### Publicado
 
 Cada cambio en `main` se publica solo en GitHub Pages con el workflow [`desplegar.yml`](.github/workflows/desplegar.yml). La URL de la API sale de la variable de repositorio `VITE_API` (no es un secreto: va dentro del JS que descarga cualquiera); si falta, el workflow falla en vez de publicar un gestor que apunta a `localhost`. En Pages el gestor vive en `/gestor-postulaciones/`, por eso `vite.config.ts` cambia la base al construir allí.
@@ -85,10 +89,9 @@ Puedes crear una cuenta propia desde la pantalla de entrada: cada usuario ve sol
 
 Prefiero decirlo a que se note.
 
-- **No hay exportación de datos.** El historial de eventos vive en PostgreSQL y se lee desde la pantalla de Métricas, pero no hay manera de sacarlo en CSV o PDF para llevarlo a otro sitio.
 - **Sin notificaciones ni recordatorios.** Si una candidatura lleva semanas sin respuesta, hay que entrar a mirar; no hay aviso por correo ni dentro de la propia app.
 - **Una cuenta, un tablero.** No hay equipos ni tableros compartidos: cada cuenta ve solo sus propias candidaturas, y no existe la opción de invitar a otra persona a colaborar en el mismo proceso de búsqueda.
-- **Sin integración con bolsas de empleo.** Cada candidatura se da de alta a mano; no hay manera de importarla automáticamente al aplicar desde LinkedIn, InfoJobs u otro sitio.
+- **Integración con bolsas de empleo, solo a través del bot.** Las ofertas que encuentra [bot-ofertas-empleo](https://github.com/danielbuitragoh/bot-ofertas-empleo) entran al tablero con `/guardar` desde Telegram; lo que se aplica desde LinkedIn o InfoJobs se sigue dando de alta a mano.
 - **Web responsive, no app ni PWA.** Funciona en el navegador del móvil, pero no es instalable ni funciona sin conexión.
 
 ## Licencia

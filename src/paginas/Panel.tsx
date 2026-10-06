@@ -8,6 +8,7 @@ import { Dialogo } from '../componentes/Dialogo';
 import { Formulario } from '../componentes/Formulario';
 import { Metricas } from './Metricas';
 import type { Postulacion } from '../api/tipos';
+import { descargarCsv } from '../exportar';
 
 type Vista = 'tablero' | 'metricas';
 
@@ -43,6 +44,14 @@ export function Panel() {
         </nav>
 
         <div className="derecha">
+          <button
+            type="button"
+            className="enlace"
+            onClick={() => descargarCsv(datos.postulaciones)}
+            disabled={datos.cargando || datos.postulaciones.length === 0}
+          >
+            Exportar CSV
+          </button>
           <button type="button" className="boton principal" onClick={() => setNueva(true)}>
             Añadir
           </button>
