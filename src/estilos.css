@@ -129,10 +129,10 @@ body {
 /* ---------- tablero ---------- */
 .tablero {
   display: grid;
-  grid-template-columns: repeat(5, minmax(216px, 1fr));
+  grid-template-columns: repeat(6, minmax(190px, 1fr));
   gap: 14px;
   /* En pantallas estrechas el tablero se desplaza en horizontal con
-     ajuste por columna, en vez de apilarse: apiladas, cinco columnas
+     ajuste por columna, en vez de apilarse: apiladas, seis columnas
      son una lista de 40 tarjetas y se pierde la idea de embudo. */
   overflow-x: auto;
   scroll-snap-type: x proximity;
@@ -160,12 +160,16 @@ body {
   font-family: var(--mono); font-size: 11px; color: var(--tinta-3);
   background: var(--superficie); border-radius: 999px; padding: 1px 7px;
 }
+/* "Por enviar" va con línea discontinua y sin color: todavía no es una fase
+   del proceso, es una lista de ofertas pendientes. Las demás conservan su
+   color, desplazadas una posición. */
 .columna:nth-child(1) h2 { box-shadow: inset 0 2px 0 0 transparent; }
-.columna:nth-child(1) { border-top: 2px solid var(--col-1); }
-.columna:nth-child(2) { border-top: 2px solid var(--col-2); }
-.columna:nth-child(3) { border-top: 2px solid var(--col-3); }
-.columna:nth-child(4) { border-top: 2px solid var(--col-4); }
-.columna:nth-child(5) { border-top: 2px solid var(--col-5); }
+.columna:nth-child(1) { border-top: 2px dashed var(--tinta-3); }
+.columna:nth-child(2) { border-top: 2px solid var(--col-1); }
+.columna:nth-child(3) { border-top: 2px solid var(--col-2); }
+.columna:nth-child(4) { border-top: 2px solid var(--col-3); }
+.columna:nth-child(5) { border-top: 2px solid var(--col-4); }
+.columna:nth-child(6) { border-top: 2px solid var(--col-5); }
 
 .pila { display: grid; gap: 9px; }
 .vacia { font-size: 12.5px; color: var(--tinta-3); padding: 10px 4px; }

@@ -52,7 +52,7 @@ export function Tarjeta({ postulacion: p, onAbrir, onMover }: Props) {
 }
 
 function columnaDe(e: Estado): Estado {
-  return e === 'guardada' ? 'postulada' : e === 'prueba' ? 'entrevista' : e === 'retirada' ? 'rechazo' : e;
+  return e === 'prueba' ? 'entrevista' : e === 'retirada' ? 'rechazo' : e;
 }
 
 function sueldo(p: Postulacion): string | null {
