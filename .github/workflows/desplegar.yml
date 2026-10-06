@@ -1,0 +1,59 @@
+# Publica el gestor en GitHub Pages en cada cambio de main.
+#
+# La URL de la API sale de la variable de repositorio VITE_API (Settings >
+# Secrets and variables > Actions > Variables). No es un secreto: va
+# incrustada en el JS que descarga cualquier visitante. Si falta, el build
+# usaría http://localhost:3000 y publicaría un gestor que no conecta con
+# nada, así que el workflow falla antes de publicar.
+name: Desplegar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar que está la URL de la API
+        env:
+          VITE_API: ${{ vars.VITE_API }}
+        run: |
+          if [ -z "$VITE_API" ]; then
+            echo "::error::Falta la variable de repositorio VITE_API con la URL de la API."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_API: ${{ vars.VITE_API }}
+          GITHUB_PAGES: '1'
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4
