@@ -39,12 +39,12 @@ export function Tablero({ postulaciones, onMover, onAbrir }: Props) {
     useSensor(KeyboardSensor),
   );
 
-  /* Las candidaturas en estados que no tienen columna ('guardada', 'prueba',
+  /* Las candidaturas en estados que no tienen columna ('prueba',
      'retirada') se agrupan en la columna más cercana en lugar de desaparecer.
      Un dato que existe y no se ve en ninguna parte es peor que uno mal
      colocado: el usuario lo da por perdido. */
   const columnaDe = (e: Estado): Estado =>
-    e === 'guardada' ? 'postulada' : e === 'prueba' ? 'entrevista' : e === 'retirada' ? 'rechazo' : e;
+    e === 'prueba' ? 'entrevista' : e === 'retirada' ? 'rechazo' : e;
 
   function alSoltar(ev: DragEndEvent) {
     setArrastrando(null);

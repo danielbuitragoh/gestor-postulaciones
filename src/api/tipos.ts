@@ -8,12 +8,14 @@ export const ESTADOS = [
 export type Estado = (typeof ESTADOS)[number];
 
 /* Las columnas del tablero NO son los ocho estados.
-   'guardada' y 'retirada' no son fases del proceso: una es el borrador y la
-   otra una salida. Y 'prueba' y 'respuesta' se agrupan con lo que significan
+   'retirada' no es una fase del proceso sino una salida. 'guardada' sí tiene
+   columna, "Por enviar": ahí llegan las ofertas que guarda el bot con
+   /guardar, que todavía no se han enviado y no deben contar como enviadas. Y 'prueba' y 'respuesta' se agrupan con lo que significan
    para quien mira el tablero. Un tablero con ocho columnas no cabe en una
    pantalla y obliga a desplazarse en horizontal para ver si hay una oferta,
    que es lo único que de verdad quieres ver. */
 export const COLUMNAS: Array<{ estado: Estado; titulo: string; ayuda: string }> = [
+  { estado: 'guardada',   titulo: 'Por enviar',  ayuda: 'Guardadas, sin enviar todavía' },
   { estado: 'postulada',  titulo: 'Enviadas',    ayuda: 'Sin respuesta todavía' },
   { estado: 'respuesta',  titulo: 'Contestaron', ayuda: 'Hay contacto, falta concretar' },
   { estado: 'entrevista', titulo: 'Entrevista',  ayuda: 'Proceso en marcha' },
