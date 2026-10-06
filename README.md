@@ -8,7 +8,7 @@
 
 ![El tablero](docs/capturas/tablero.png)
 
-[La API que consume](https://github.com/danielbuitragoh/api-postulaciones) · [Daniel Buitrago](https://github.com/danielbuitragoh)
+[**Abrir el gestor**](https://danielbuitragoh.github.io/gestor-postulaciones/) · [La API que consume](https://github.com/danielbuitragoh/api-postulaciones) · [Daniel Buitrago](https://github.com/danielbuitragoh)
 
 </div>
 
@@ -72,6 +72,14 @@ npm run build # comprueba tipos y empaqueta
 npm run lint # oxlint
 npm run preview # sirve lo empaquetado
 ```
+
+### Publicado
+
+Cada cambio en `main` se publica solo en GitHub Pages con el workflow [`desplegar.yml`](.github/workflows/desplegar.yml). La URL de la API sale de la variable de repositorio `VITE_API` (no es un secreto: va dentro del JS que descarga cualquiera); si falta, el workflow falla en vez de publicar un gestor que apunta a `localhost`. En Pages el gestor vive en `/gestor-postulaciones/`, por eso `vite.config.ts` cambia la base al construir allí.
+
+La API tiene que aceptar ese origen en su variable `ORIGENES` (`https://danielbuitragoh.github.io`), o el navegador bloquea las peticiones por CORS.
+
+Puedes crear una cuenta propia desde la pantalla de entrada: cada usuario ve solo sus candidaturas.
 
 ## Lo que no está hecho
 
