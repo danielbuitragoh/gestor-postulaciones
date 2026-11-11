@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSesion } from '../estado/sesion';
-  import { usePostulaciones } from '../estado/usePostulaciones';
+import { usePostulaciones } from '../estado/usePostulaciones';
 import { Tablero } from '../componentes/Tablero';
 import { Dialogo } from '../componentes/Dialogo';
 import { Formulario } from '../componentes/Formulario';
@@ -13,7 +13,7 @@ import { descargarCsv } from '../exportar';
 type Vista = 'tablero' | 'metricas';
 
 export function Panel() {
-  const { api, usuario, salir } = useSesion();
+  const { api, usuario, salir, demo } = useSesion();
   const datos = usePostulaciones(api);
 
   const [vista, setVista] = useState<Vista>('tablero');
@@ -60,6 +60,13 @@ export function Panel() {
           </button>
         </div>
       </header>
+
+      {demo && (
+        <p className="aviso-demo" role="note">
+          <strong>Demo.</strong> Datos de ejemplo guardados en esta pestaña: puedes mover, editar y borrar sin miedo.
+          Con una cuenta, lo mismo se guarda en la API real.
+        </p>
+      )}
 
       {/* El aviso de un cambio revertido vive fuera del tablero y con
           `role="status"`: si apareciera dentro de la columna, el propio
