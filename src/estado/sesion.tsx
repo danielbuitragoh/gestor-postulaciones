@@ -11,6 +11,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Cliente } from '../api/cliente';
 import { recursos, type Api } from '../api/recursos';
+import { apiDemo, USUARIO_DEMO } from '../api/demo';
 import type { Usuario } from '../api/tipos';
 
 const BASE = import.meta.env['VITE_API'] ?? 'http://localhost:3000';
@@ -19,6 +20,9 @@ interface Valor {
   api: Api;
   usuario: Usuario | null;
   cargando: boolean;
+  /** Sesión de demostración: datos de ejemplo en memoria, sin servidor ni cuenta. */
+  demo: boolean;
+  entrarDemo: () => void;
   entrar: (u: Usuario, acceso: string, refresco: string) => void;
   salir: () => void;
 }
@@ -27,7 +31,12 @@ const Contexto = createContext<Valor | null>(null);
 
 export function ProveedorSesion({ children }: { children: ReactNode }) {
   const cliente = useMemo(() => new Cliente(BASE), []);
-  const api = useMemo(() => recursos(cliente), [cliente]);
+  const apiReal = useMemo(() => recursos(cliente), [cliente]);
+
+  /* La demo no se guarda en ningún sitio: al recargar la página se vuelve al
+     formulario de acceso y los datos de ejemplo empiezan de cero. */
+  const [demo, setDemo] = useState<Api | null>(null);
+  const api = demo ?? apiReal;
 
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -37,7 +46,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
 
     if (!cliente.haySesion) { setCargando(false); return; }
 
-    api.yo()
+    apiReal.yo()
       .then((r) => { if (vigente) setUsuario(r.usuario); })
       .catch(() => { if (vigente) { cliente.cerrarSesion(); setUsuario(null); } })
       .finally(() => { if (vigente) setCargando(false); });
@@ -45,25 +54,31 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     /* El guardia evita el aviso de actualizar un componente desmontado, que en
        desarrollo salta siempre porque React monta los efectos dos veces. */
     return () => { vigente = false; };
-  }, [api, cliente]);
+  }, [apiReal, cliente]);
 
   const entrar = useCallback((u: Usuario, acceso: string, refresco: string) => {
     cliente.guardarSesion(acceso, refresco);
     setUsuario(u);
   }, [cliente]);
 
+  const entrarDemo = useCallback(() => {
+    setDemo(apiDemo());
+    setUsuario(USUARIO_DEMO);
+  }, []);
+
   const salir = useCallback(() => {
+    if (demo) { setDemo(null); setUsuario(null); return; }
     /* Se limpia el estado local SIN esperar a la API. Si el servidor no
        responde, el usuario que pulsó salir tiene que quedarse fuera igual:
        dejarle dentro porque falló una petición es lo contrario de lo que pidió. */
-    void api.salir().catch(() => {});
+    void apiReal.salir().catch(() => {});
     cliente.cerrarSesion();
     setUsuario(null);
-  }, [api, cliente]);
+  }, [apiReal, cliente, demo]);
 
   const valor = useMemo<Valor>(
-    () => ({ api, usuario, cargando, entrar, salir }),
-    [api, usuario, cargando, entrar, salir],
+    () => ({ api, usuario, cargando, demo: demo !== null, entrarDemo, entrar, salir }),
+    [api, usuario, cargando, demo, entrarDemo, entrar, salir],
   );
 
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
