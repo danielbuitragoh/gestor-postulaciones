@@ -8,7 +8,7 @@
 
 ![El tablero](docs/capturas/tablero.png)
 
-[**Abrir el gestor**](https://danielbuitragoh.github.io/gestor-postulaciones/) · [La API que consume](https://github.com/danielbuitragoh/api-postulaciones) · [Daniel Buitrago](https://github.com/danielbuitragoh)
+[**Abrir el gestor**](https://danielbuitragoh.github.io/gestor-postulaciones/) (botón «Entrar a la demo»: datos de ejemplo, sin cuenta) · [La API que consume](https://github.com/danielbuitragoh/api-postulaciones) · [Daniel Buitrago](https://github.com/danielbuitragoh)
 
 </div>
 
@@ -30,7 +30,7 @@ Es un front hecho a mano contra una API propia: React 19 con TypeScript, sin lib
 
 **El token de acceso vive solo en memoria y nunca en localStorage.** Cualquier script que se cuele en la página —una dependencia comprometida, una extensión— puede leer localStorage entero. El de refresco sí va a localStorage, y está documentado en el código como el compromiso que es: lo correcto sería una cookie `httpOnly`, que exige que el front y la API compartan dominio, y este front está pensado para desplegarse aparte. La mitigación es real, no retórica: la API rota el token en cada uso, así que uno robado deja de servir en cuanto el usuario legítimo refresca.
 
-**Las cinco columnas del tablero no son los ocho estados de la API.** Se agrupan a propósito: `guardada` es un borrador y `retirada` una salida, no fases del proceso, y ocho columnas obligan a desplazarse en horizontal para ver si hay una oferta, que es justo lo único que quieres ver de un vistazo. Lo importante es que los estados sin columna propia se recogen en la más cercana en lugar de desaparecer: un dato que existe y no se ve en ninguna parte es peor que uno colocado en la columna de al lado, porque el usuario lo da por perdido.
+**Las seis columnas del tablero no son los ocho estados de la API.** Se agrupan a propósito: `guardada` tiene su columna, «Por enviar», porque ahí llegan las ofertas que guarda el bot y no deben contar como enviadas; `prueba` va con «Entrevista» y `retirada`, que es una salida y no una fase, con «Cerradas». Ocho columnas obligan a desplazarse en horizontal para ver si hay una oferta, que es justo lo único que quieres ver de un vistazo. Lo importante es que los estados sin columna propia se recogen en la más cercana en lugar de desaparecer: un dato que existe y no se ve en ninguna parte es peor que uno colocado en la columna de al lado, porque el usuario lo da por perdido.
 
 **Los mensajes de validación se pintan junto a su campo, enlazados con `aria-describedby`.** La API devuelve los errores campo a campo y el formulario los coloca donde toca, con `aria-invalid` en el input. Un aviso genérico arriba del formulario obliga a adivinar cuál de los ocho campos está mal, y sin el enlace un lector de pantalla lee el campo sin decir nunca qué le pasa.
 
@@ -84,6 +84,8 @@ Cada cambio en `main` se publica solo en GitHub Pages con el workflow [`desplega
 La API tiene que aceptar ese origen en su variable `ORIGENES` (`https://danielbuitragoh.github.io`), o el navegador bloquea las peticiones por CORS.
 
 Puedes crear una cuenta propia desde la pantalla de entrada: cada usuario ve solo sus candidaturas.
+
+Para verlo sin cuenta, **«Entrar a la demo»** carga ocho candidaturas de empresas inventadas en la memoria de la pestaña (`src/api/demo.ts`, con la misma interfaz que la API). Se puede mover, editar y borrar; nada sale al servidor y al recargar la página empieza de cero. Las métricas de la demo siguen las mismas reglas que la API, copiadas a mano: si la API cambia, la demo no se entera sola.
 
 ## Lo que no está hecho
 
