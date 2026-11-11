@@ -137,6 +137,10 @@ body {
   overflow-x: auto;
   scroll-snap-type: x proximity;
   padding-bottom: 8px;
+  /* Sin esto, los textos solo para lectores de pantalla de cada columna (que
+     van en position: absolute) se escapan del recorte del tablero y ensanchan
+     toda la página en el móvil: 1.064 px de ancho en una pantalla de 390. */
+  position: relative;
 }
 .columna {
   scroll-snap-align: start;
@@ -311,6 +315,25 @@ body {
 .caja .lema { color: var(--tinta-2); font-size: 14px; margin: 6px 0 24px; }
 .caja form { display: grid; gap: 14px; }
 .caja .cambiar { margin-top: 18px; font-size: 13.5px; color: var(--tinta-2); }
+
+/* La entrada a la demo va antes que el formulario: es lo que busca casi todo
+   el que llega a esta página desde fuera. */
+.demo-entrada {
+  border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie);
+  padding: 16px; display: grid; gap: 12px;
+}
+.demo-entrada p { font-size: 13.5px; color: var(--tinta-2); }
+.demo-entrada strong { color: var(--tinta); font-weight: 600; }
+.caja .separador {
+  display: flex; align-items: center; gap: 12px; margin: 20px 0 16px;
+  font-size: 12px; color: var(--tinta-3); text-transform: uppercase; letter-spacing: .08em;
+}
+.caja .separador::before, .caja .separador::after { content: ""; flex: 1; height: 1px; background: var(--borde); }
+.aviso-demo {
+  background: var(--superficie-alta); border: 1px solid var(--borde); color: var(--tinta-2);
+  border-radius: 10px; padding: 10px 14px; font-size: 13.5px; margin-bottom: 16px;
+}
+.aviso-demo strong { color: var(--tinta); font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
