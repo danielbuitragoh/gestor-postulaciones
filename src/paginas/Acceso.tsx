@@ -5,7 +5,7 @@ import { useSesion } from '../estado/sesion';
 import { ErrorApi } from '../api/tipos';
 
 export function Acceso() {
-  const { api, entrar } = useSesion();
+  const { api, entrar, entrarDemo } = useSesion();
   const [modo, setModo] = useState<'acceso' | 'registro'>('acceso');
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
@@ -39,6 +39,20 @@ export function Acceso() {
         <p className="lema">
           Un tablero para saber por dónde va cada proceso y cuánto llevan sin contestar.
         </p>
+
+        {/* Lo primero que ve quien llega desde el portafolio: una forma de
+            entrar que no le pide crear una cuenta en una base de datos real. */}
+        <section className="demo-entrada" aria-label="Demo">
+          <p>
+            <strong>¿Solo quieres verlo?</strong> Entra con datos de ejemplo. Viven en esta
+            pestaña: no se crea ninguna cuenta y no se envía nada al servidor.
+          </p>
+          <button type="button" className="boton principal ancho" onClick={entrarDemo}>
+            Entrar a la demo
+          </button>
+        </section>
+
+        <p className="separador">o usa tu cuenta</p>
 
         <form onSubmit={enviar} noValidate>
           {general && <p className="aviso-error" role="alert">{general}</p>}
